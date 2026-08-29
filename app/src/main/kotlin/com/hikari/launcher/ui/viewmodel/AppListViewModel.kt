@@ -78,7 +78,7 @@ class AppListViewModel : ViewModel() {
                                 packageName = app.packageName,
                                 label = label,
                                 icon = icon,
-                                installTime = app.firstInstallTime,
+                                installTime = try { context.packageManager.getPackageInfo(app.packageName, 0).firstInstallTime } catch (e: Exception) { 0L },
                                 lastUsed = 0L
                             )
                         )
