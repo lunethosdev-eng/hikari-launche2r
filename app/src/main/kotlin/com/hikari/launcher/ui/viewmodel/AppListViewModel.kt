@@ -5,7 +5,8 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hikari.launcher.ui.screens.AppItem
+import com.hikari.launcher.data.models.AppItem
+import com.hikari.launcher.data.models.SortType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AppListViewModel : ViewModel() {
-
     private val _apps = MutableStateFlow<List<AppItem>>(emptyList())
     val apps: StateFlow<List<AppItem>> = _apps.asStateFlow()
 
@@ -59,22 +59,26 @@ class AppListViewModel : ViewModel() {
             SortType.NAME -> _filteredApps.value.sortedBy { it.label }
             SortType.INSTALL_TIME -> _filteredApps.value.sortedByDescending { it.installTime }
             SortType.LAST_USED -> _filteredApps.value.sortedByDescending { it.lastUsed }
+            SortType.SIZE -> _filteredApps.value
         }
     }
 
     private fun getInstalledApps(context: Context): List<AppItem> {
         val packageManager = context.packageManager
-        val apps = mutableListOf<AppItem>()
-
+        val appsList = mutableListOf<AppItem>()
         try {
             val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             packages.forEach { app ->
-                if (app.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
+                if ((app.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
                     try {
                         val label = packageManager.getApplicationLabel(app).toString()
                         val icon = packageManager.getApplicationIcon(app)
-                        apps.add(
-                            AppItem(packageName = app.packageName, label = label, icon = icon, installTime = 0L, lastUsed = 0L).firstInstallTime } catch (e: Exception) { 0L },
+                        appsList.add(
+                            AppItem(
+                                packageName = app.packageName,
+                                label = label,
+                                icon = icon,
+                                installTime = 0L,
                                 lastUsed = 0L
                             )
                         )
@@ -86,13 +90,6 @@ class AppListViewModel : ViewModel() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-        return apps.sortedBy { it.label }
+        return appsList.sortedBy { it.label }
     }
-}
-
-enum class SortType {
-    NAME,
-    INSTALL_TIME,
-    LAST_USED
 }
