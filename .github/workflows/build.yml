@@ -27,11 +27,8 @@ jobs:
       with:
         gradle-version: '8.4'
 
-    - name: Dar permisos a Gradle
-      run: chmod +x ./gradlew
-
     - name: Compilar APKs con Gradle
-      run: ./gradlew assembleDebug assembleRelease
+      run: gradle assembleDebug assembleRelease
 
     - name: Subir APK Debug
       uses: actions/upload-artifact@v4
