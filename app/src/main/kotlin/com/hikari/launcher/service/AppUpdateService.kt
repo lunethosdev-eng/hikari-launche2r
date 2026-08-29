@@ -58,7 +58,7 @@ class AppUpdateService : Service() {
             addDataScheme("package")
         }
 
-        ContextCompat.registerBroadcastReceiver(
+        ContextCompat.registerReceiver(
             this,
             packageReceiver!!,
             intentFilter,

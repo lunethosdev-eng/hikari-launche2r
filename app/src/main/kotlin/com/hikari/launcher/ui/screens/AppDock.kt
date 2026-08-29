@@ -1,5 +1,7 @@
 package com.hikari.launcher.ui.screens
 
+import androidx.compose.foundation.clickable
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring

@@ -2,7 +2,7 @@ package com.hikari.launcher.ui.theme
 
 import android.app.Activity
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkMode
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -29,7 +29,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun HikariLauncherTheme(
-    darkTheme: Boolean = isSystemInDarkMode(),
+    darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
