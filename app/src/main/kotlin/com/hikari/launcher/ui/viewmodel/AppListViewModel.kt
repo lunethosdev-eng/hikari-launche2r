@@ -74,11 +74,7 @@ class AppListViewModel : ViewModel() {
                         val label = packageManager.getApplicationLabel(app).toString()
                         val icon = packageManager.getApplicationIcon(app)
                         apps.add(
-                            AppItem(
-                                packageName = app.packageName,
-                                label = label,
-                                icon = icon,
-                                installTime = try { context.packageManager.getPackageInfo(app.packageName, 0).firstInstallTime } catch (e: Exception) { 0L },
+                            AppItem(packageName = app.packageName, label = label, icon = icon, installTime = 0L, lastUsed = 0L).firstInstallTime } catch (e: Exception) { 0L },
                                 lastUsed = 0L
                             )
                         )
