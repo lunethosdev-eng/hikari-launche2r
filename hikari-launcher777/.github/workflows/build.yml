@@ -1,0 +1,54 @@
+name: Compilar Hikari Launcher
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Configurar JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+        
+    - name: Dar permisos al gradlew
+      run: chmod +x gradlew
+      
+    - name: Compilar APK Debug
+      run: ./gradlew assembleDebug
+      
+    - name: Compilar APK Release
+      run: ./gradlew assembleRelease
+      
+    - name: Subir APK Debug
+      uses: actions/upload-artifact@v3
+      with:
+        name: Hikari-Launcher-debug.apk
+        path: app/build/outputs/apk/debug/
+        
+    - name: Subir APK Release
+      uses: actions/upload-artifact@v3
+      with:
+        name: Hikari-Launcher-release.apk
+        path: app/build/outputs/apk/release/
+        
+    - name: Crear Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Hikari Launcher ${{ github.ref }}
+        draft: false
+        prerelease: false

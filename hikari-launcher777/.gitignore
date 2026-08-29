@@ -1,0 +1,53 @@
+# Gradle files
+.gradle/
+build/
+*.apk
+*.ap_
+*.aab
+
+# Local configuration file
+local.properties
+
+# Log/OS Files
+*.log
+.DS_Store
+
+# Android Studio
+.idea/
+.classpath
+.c9/
+*.class
+*.dex
+*.o
+*.so
+
+# Generated files
+bin/
+gen/
+out/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Local environment
+local.properties
+
+# Build
+.gradle
+/build
+/app/build
+
+# IDE
+.idea
+*.iml
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.swp
+*.swo
+*~
