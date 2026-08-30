@@ -22,14 +22,16 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // Minify/shrink desactivados para evitar OutOfMemoryError en R8 en CI.
+            // Los keep rules del proyecto son muy amplios (androidx.**, kotlin.**)
+            // por lo que el beneficio de minify es marginal y no justifica el OOM.
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
-            // Evitar OutOfMemoryError en R8 durante minify/shrink
             isCrunchPngs = false
         }
         debug {
