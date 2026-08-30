@@ -11,8 +11,8 @@ android {
         applicationId = "com.hikari.launcher"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -23,8 +23,6 @@ android {
     buildTypes {
         release {
             // Minify/shrink desactivados para evitar OutOfMemoryError en R8 en CI.
-            // Los keep rules del proyecto son muy amplios (androidx.**, kotlin.**)
-            // por lo que el beneficio de minify es marginal y no justifica el OOM.
             isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(
@@ -57,7 +55,6 @@ android {
     }
 
     lint {
-        // No bloquear el ensamblado de release por errores de lint en CI
         checkReleaseBuilds = false
         abortOnError = false
     }
@@ -78,6 +75,7 @@ dependencies {
 
     // Lifecycle Compose (collectAsStateWithLifecycle)
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
     // Jetpack Compose
     val composeBom = platform("androidx.compose:compose-bom:2023.10.00")
@@ -87,6 +85,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.animation:animation")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.5")

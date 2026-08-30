@@ -15,22 +15,42 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+// Esquema oscuro cósmico (el launcher siempre usa dark theme tipo VoidLauncher)
+private val HikariDarkColorScheme = darkColorScheme(
+    primary = HikariCyan,
+    onPrimary = CosmicBlack,
+    primaryContainer = HikariIndigo,
+    onPrimaryContainer = TextPrimary,
+    secondary = HikariPurple,
+    onSecondary = CosmicBlack,
+    secondaryContainer = CosmicSurfaceVariant,
+    onSecondaryContainer = TextPrimary,
+    tertiary = HikariPink,
+    onTertiary = CosmicBlack,
+    background = CosmicBlack,
+    onBackground = TextPrimary,
+    surface = CosmicSurface,
+    onSurface = TextPrimary,
+    surfaceVariant = CosmicSurfaceVariant,
+    onSurfaceVariant = TextSecondary,
+    outline = GlassBorder,
+    outlineVariant = CosmicSurfaceVariant
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+private val HikariLightColorScheme = lightColorScheme(
+    primary = HikariBlue,
+    secondary = HikariIndigo,
+    tertiary = HikariPink,
+    background = CosmicBlack,
+    onBackground = TextPrimary,
+    surface = CosmicSurface,
+    onSurface = TextPrimary
 )
 
 @Composable
 fun HikariLauncherTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    darkTheme: Boolean = true, // El launcher siempre es dark/cósmico
+    dynamicColor: Boolean = false, // Desactivado para mantener la estética cósmica consistente
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -38,16 +58,19 @@ fun HikariLauncherTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> HikariDarkColorScheme
+        else -> HikariLightColorScheme
     }
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view)?.isAppearanceLightStatusBars = !darkTheme
+            window.statusBarColor = CosmicBlack.toArgb()
+            window.navigationBarColor = CosmicBlack.toArgb()
+            val controller = WindowCompat.getInsetsController(window, view)
+            controller.isAppearanceLightStatusBars = false
+            controller.isAppearanceLightNavigationBars = false
         }
     }
 
