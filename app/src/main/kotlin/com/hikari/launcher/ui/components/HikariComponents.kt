@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -114,13 +115,16 @@ fun GradientBackground(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val backgroundColor = MaterialTheme.colorScheme.background
     Box(
-        modifier = modifier
-            .background(
-                brush = androidx.compose.foundation.background(
-                    MaterialTheme.colorScheme.background
-                ).brush
+        modifier = modifier.background(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    backgroundColor,
+                    backgroundColor.copy(alpha = 0.8f)
+                )
             )
+        )
     ) {
         content()
     }
@@ -166,7 +170,7 @@ fun SettingCard(
 
 @Composable
 fun EmptyStateView(
-    icon: androidx.compose.material.icons.materialIcon? = null,
+    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
     title: String,
     description: String? = null
 ) {
@@ -176,6 +180,17 @@ fun EmptyStateView(
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (icon != null) {
+            androidx.compose.material3.Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(bottom = 16.dp)
+            )
+        }
+
         Text(
             title,
             style = MaterialTheme.typography.headlineSmall,
@@ -186,7 +201,7 @@ fun EmptyStateView(
             Text(
                 description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackgroundVariant,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }

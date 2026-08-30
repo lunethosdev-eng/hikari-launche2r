@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -56,8 +57,12 @@ class LauncherPreferences(private val context: Context) {
     suspend fun setThemeColor(color: String) {
         context.dataStore.edit { it[THEME_COLOR] = color }
     }
-}
 
-private suspend fun <T> (DataStore<Preferences>).edit(block: suspend (MutableMap<Preferences.Key<*>, Any>) -> Unit) {
-    // Implementation needed
+    suspend fun setShowNotificationBadge(show: Boolean) {
+        context.dataStore.edit { it[SHOW_NOTIFICATION_BADGE] = show }
+    }
+
+    suspend fun setHideSystemApps(hide: Boolean) {
+        context.dataStore.edit { it[HIDE_SYSTEM_APPS] = hide }
+    }
 }

@@ -1,108 +1,87 @@
 package com.hikari.launcher.ui.viewmodel
 
-import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
-import androidx.test.core.app.ApplicationProvider
-import com.hikari.launcher.ui.screens.AppItem
+import androidx.lifecycle.ViewModel
+import com.hikari.launcher.data.models.AppItem
+import com.hikari.launcher.data.models.SortType
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows.shadowOf
-import org.robolectric.shadows.ShadowPackageManager
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@RunWith(RobolectricTestRunner::class)
 class AppListViewModelTest {
 
     private lateinit var viewModel: AppListViewModel
-    private lateinit var context: Context
-    private lateinit var packageManager: PackageManager
-    private lateinit var shadowPackageManager: ShadowPackageManager
 
     @Before
     fun setUp() {
-        context = ApplicationProvider.getApplicationContext()
-        packageManager = context.packageManager
-        shadowPackageManager = shadowOf(packageManager)
         viewModel = AppListViewModel()
     }
 
     @Test
-    fun testLoadAppsSuccessfully() {
-        // Arrange
-        val appLabel = "Test App"
-        val packageName = "com.test.app"
-        
-        // Act
-        viewModel.loadApps(context)
-        
-        // Assert
-        assertTrue(viewModel.isLoading.value == false)
-    }
-
-    @Test
-    fun testSearchAppsFiltersCorrectly() {
-        // Arrange
-        val apps = listOf(
-            AppItem("com.whatsapp", "WhatsApp", null),
-            AppItem("com.facebook", "Facebook", null),
-            AppItem("com.twitter", "Twitter", null)
-        )
-        
-        // Act
-        viewModel.searchApps("WhatsApp")
-        
-        // Assert
-        assertEquals(viewModel.searchQuery.value, "WhatsApp")
-    }
-
-    @Test
-    fun testSortAppsByName() {
-        // Arrange
-        val apps = listOf(
-            AppItem("com.z.app", "Zapp", null),
-            AppItem("com.a.app", "Aapp", null),
-            AppItem("com.m.app", "Mapp", null)
-        )
-        
-        // Act
-        viewModel.sortApps(SortType.NAME)
-        
-        // Assert
-        assertTrue(viewModel.filteredApps.value.isNotEmpty())
-    }
-
-    @Test
-    fun testEmptySearchQuery() {
-        // Arrange
-        viewModel.searchApps("Test")
-        
-        // Act
-        viewModel.searchApps("")
-        
-        // Assert
+    fun testInitialState() {
+        assertTrue(viewModel.apps.value.isEmpty())
+        assertEquals(viewModel.filteredApps.value, viewModel.apps.value)
         assertEquals(viewModel.searchQuery.value, "")
     }
 
     @Test
-    fun testCaseSensitiveSearch() {
-        // Arrange
-        val query1 = "WHATSAPP"
-        val query2 = "whatsapp"
-        val query3 = "WhatsApp"
-        
-        // Act & Assert
-        viewModel.searchApps(query1)
-        assertTrue(viewModel.searchQuery.value == query1)
-        
-        viewModel.searchApps(query2)
-        assertTrue(viewModel.searchQuery.value == query2)
-        
-        viewModel.searchApps(query3)
-        assertTrue(viewModel.searchQuery.value == query3)
+    fun testSearchQueryUpdates() {
+        viewModel.searchApps("Test")
+        assertEquals(viewModel.searchQuery.value, "Test")
+    }
+
+    @Test
+    fun testEmptySearchQueryResetsFilter() {
+        viewModel.searchApps("Test")
+        viewModel.searchApps("")
+        assertEquals(viewModel.searchQuery.value, "")
+        assertEquals(viewModel.filteredApps.value, viewModel.apps.value)
+    }
+
+    @Test
+    fun testSearchFiltersByLabel() {
+        // Simula apps internamente poniendo el StateFlow
+        val field = AppListViewModel::class.java.getDeclaredField("_apps")
+        field.isAccessible = true
+        val flow = field.get(viewModel) as kotlinx.coroutines.flow.MutableStateFlow<List<AppItem>>
+        flow.value = listOf(
+            AppItem(packageName = "com.whatsapp", label = "WhatsApp"),
+            AppItem(packageName = "com.facebook", label = "Facebook")
+        )
+
+        viewModel.searchApps("whats")
+        assertEquals(1, viewModel.filteredApps.value.size)
+        assertEquals("WhatsApp", viewModel.filteredApps.value.first().label)
+    }
+
+    @Test
+    fun testSearchFiltersByPackageName() {
+        val field = AppListViewModel::class.java.getDeclaredField("_apps")
+        field.isAccessible = true
+        val flow = field.get(viewModel) as kotlinx.coroutines.flow.MutableStateFlow<List<AppItem>>
+        flow.value = listOf(
+            AppItem(packageName = "com.example.app", label = "Ejemplo"),
+            AppItem(packageName = "org.other.app", label = "Otro")
+        )
+
+        viewModel.searchApps("com.example")
+        assertEquals(1, viewModel.filteredApps.value.size)
+        assertEquals("Ejemplo", viewModel.filteredApps.value.first().label)
+    }
+
+    @Test
+    fun testSortByName() {
+        val field = AppListViewModel::class.java.getDeclaredField("_filteredApps")
+        field.isAccessible = true
+        val flow = field.get(viewModel) as kotlinx.coroutines.flow.MutableStateFlow<List<AppItem>>
+        flow.value = listOf(
+            AppItem(packageName = "com.z", label = "Zebra"),
+            AppItem(packageName = "com.a", label = "Apple"),
+            AppItem(packageName = "com.m", label = "Mango")
+        )
+
+        viewModel.sortApps(SortType.NAME)
+        val labels = viewModel.filteredApps.value.map { it.label }
+        assertEquals(listOf("Apple", "Mango", "Zebra"), labels)
     }
 }

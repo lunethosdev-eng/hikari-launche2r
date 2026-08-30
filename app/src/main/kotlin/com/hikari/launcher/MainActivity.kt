@@ -1,5 +1,6 @@
 package com.hikari.launcher
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.hikari.launcher.ui.theme.HikariLauncherTheme
 import com.hikari.launcher.ui.screens.HomeScreen
+import com.hikari.launcher.ui.SettingsActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +21,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
+                    HomeScreen(
+                        onSettingsClick = {
+                            startActivity(
+                                Intent(this@MainActivity, SettingsActivity::class.java)
+                            )
+                        }
+                    )
                 }
             }
         }

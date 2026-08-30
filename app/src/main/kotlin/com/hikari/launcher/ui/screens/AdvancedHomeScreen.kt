@@ -1,9 +1,10 @@
 package com.hikari.launcher.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,7 +12,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,21 +23,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hikari.launcher.data.models.AppItem
 import com.hikari.launcher.ui.components.AnimatedAppIcon
 import com.hikari.launcher.ui.viewmodel.AppListViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun AdvancedHomeScreen(
     viewModel: AppListViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val apps by androidx.lifecycle.compose.collectAsStateWithLifecycle(viewModel.filteredApps)
-    val isLoading by androidx.lifecycle.compose.collectAsStateWithLifecycle(viewModel.isLoading)
-    val searchQuery by androidx.lifecycle.compose.collectAsStateWithLifecycle(viewModel.searchQuery)
+    val apps by viewModel.filteredApps.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     var selectedApp by remember { mutableStateOf<AppItem?>(null) }
 
@@ -54,7 +53,7 @@ fun AdvancedHomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                contentAlignment = Alignment.SpaceBetween
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     "Hikari Launcher",
@@ -91,7 +90,7 @@ fun AdvancedHomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 90.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
+                    contentPadding = PaddingValues(8.dp)
                 ) {
                     items(apps, key = { it.packageName }) { app ->
                         AnimatedAppIcon(
@@ -126,18 +125,10 @@ fun AdvancedHomeScreen(
     }
 }
 
-// Extensión para collectAsStateWithLifecycle
-@Composable
-private fun <T> androidx.lifecycle.compose.collectAsStateWithLifecycle(
-    flow: kotlinx.coroutines.flow.StateFlow<T>
-): androidx.compose.runtime.State<T> {
-    val context = LocalContext.current
-    return androidx.compose.runtime.produceState(
-        initialValue = flow.value,
-        flow
-    ) {
-        withContext(Dispatchers.Main.immediate) {
-            flow.collect { value = it }
-        }
+fun launchApp(context: android.content.Context, packageName: String) {
+    val intent = context.packageManager.getLaunchIntentForPackage(packageName)
+    if (intent != null) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 }
